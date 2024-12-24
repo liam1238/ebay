@@ -1,16 +1,21 @@
-import styled from 'styled-components';
-// import NxWelcome from './nx-welcome';
-import { Ebay } from '@react-liam/ebay'
+// import { Ebay } from '@react-liam/ebay';
+import { MyContainer } from '@react-liam/ebay';
+import { createGlobalStyle } from 'styled-components';
 
-const StyledApp = styled.div`
-  // Your style here
+const GlobalStyles = createGlobalStyle`
+  body, h1 {
+    margin: 0;
+    padding: 0;
+  }
 `;
 
 export function App() {
   return (
-    <StyledApp>
-      <Ebay />
-    </StyledApp>
+    <>
+      <GlobalStyles />
+      {/* <Ebay /> */}
+      <MyContainer />
+    </>
   );
 }
 

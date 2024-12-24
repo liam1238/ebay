@@ -186,6 +186,5 @@ export const EbayForm = ({ defaultValues }: { defaultValues: FormData }) => {
             <Button type="submit" variant="contained" fullWidth>Submit</Button>
         </Box>
     </form>
-
   );
 };
