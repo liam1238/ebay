@@ -12,18 +12,22 @@ export const useRandomUser = () => {
       try {
         setIsLoading(true);
         const response = await fetch('https://randomuser.me/api/');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const res = await response.json();
-        const data = get(res, 'results[0]', null) as RandomUser | null;
-        setUser(data);
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
+        if (response.ok) {
+          const res = await response.json();
+          const data = get(res, 'results[0]', null) as RandomUser | null;
+          setUser(data);
         } else {
-          setError('An unknown error occurred');
+          setError(`${response.status}: ${response.statusText}`);
         }
+        // if (!response.ok) {
+        //   throw new Error('Network response was not ok');
+        //   // error from the api
+        // }
+        // const res = await response.json();
+        // const data = get(res, 'results[0]', null) as RandomUser | null;
+        // setUser(data);
+      } catch (err) {
+        setError((err as Error).message);
       } finally {
         setIsLoading(false);
       }
