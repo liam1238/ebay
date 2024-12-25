@@ -1,8 +1,9 @@
-import { ReactElement, useState, useEffect, useRef } from 'react';
+import { ReactElement, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { SideBar } from './sidebar';
 import { Footer } from './footer';
 import { Form } from './form';
+import { useAppContext } from '../context/AppContext';
 import { useRandomUser } from './use-random-user';
 import debounce from 'lodash/debounce';
 
@@ -15,42 +16,34 @@ const StyledContainer = styled.div`
   flex-direction: column;
 `;
 
+const StyledFlexDiv = styled.div`
+  display: flex;
+  width: 100%;
+`;
+
 export const MyContainer = (): ReactElement => {
-  const { user, isLoading, error } = useRandomUser();
-  const [textareaValue, setTextareaValue] = useState<string>('');
-  const [updatedUser, setUpdatedUser] = useState<any>(null);
+  const { state, dispatch } = useAppContext();
+  const { user, isLoading, error, textareaValue, updatedUser } = state;
 
-  // Use a ref to hold the debounced function
-  const debouncedUpdateRef = useRef<ReturnType<typeof debounce>>();
+  useRandomUser(); // Fetch data from the Random User API
 
-  // Create debounced function in useEffect (runs once on mount)
-  useEffect(() => {
-    debouncedUpdateRef.current = debounce((value: string) => {
-      try {
-        const parsedValue = JSON.parse(value);
-        setUpdatedUser(parsedValue); // Update user state
-      } catch {
-        console.error('Invalid JSON format');
-      }
-    }, 1000);
+  // We are using useMemo here to ensures that the debounce function remains the same reference between renders unless dispatch changes.
+  const debouncedUpdate = useMemo(
+    () =>
+      debounce((value: string) => {
+        try {
+          const parsedValue = JSON.parse(value);
+          dispatch({ type: 'SET_UPDATED_USER', payload: parsedValue });
+        } catch {
+          console.error('Invalid JSON format');
+        }
+      }, 1000),
+    [dispatch]
+  );
 
-    // Cleanup on unmount
-    return () => {
-      debouncedUpdateRef.current?.cancel();
-    };
-  }, []);
-
-  // Update textareaValue when user data is fetched
-  useEffect(() => {
-    if (user) {
-      setTextareaValue(JSON.stringify(user, null, 2));
-    }
-  }, [user]);
-
-  // Handle textarea changes
   const handleTextareaChange = (value: string) => {
-    setTextareaValue(value);
-    debouncedUpdateRef.current?.(value); // Call debounced function
+    dispatch({ type: 'SET_TEXTAREA_VALUE', payload: value });
+    debouncedUpdate(value);
   };
 
   const handleSave = () => {
@@ -59,13 +52,11 @@ export const MyContainer = (): ReactElement => {
 
   const handleReset = () => {
     if (user) {
-      setTextareaValue(JSON.stringify(user, null, 2));
-      setUpdatedUser(user);
+      dispatch({ type: 'RESET', payload: user });
     }
     console.log('Reset to initial user data');
   };
 
-  // Listen for updatedUser changes and log it
   useEffect(() => {
     if (updatedUser) {
       console.log('Debounced User updated:', updatedUser);
@@ -78,13 +69,13 @@ export const MyContainer = (): ReactElement => {
       {error && <div>{error}</div>}
       {!error && !isLoading && (
         <div>
-          <div style={{ display: 'flex', width: '100%' }}>
+          <StyledFlexDiv>
             <SideBar />
             <Form
               textareaValue={textareaValue}
               onTextareaChange={handleTextareaChange}
             />
-          </div>
+          </StyledFlexDiv>
           <Footer onSave={handleSave} onReset={handleReset} />
         </div>
       )}

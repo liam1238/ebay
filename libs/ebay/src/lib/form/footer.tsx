@@ -1,3 +1,4 @@
+import { Button } from '@mui/material';
 import { ReactElement } from 'react';
 import styled from 'styled-components';
 
@@ -8,6 +9,13 @@ const StyledFooter = styled.div`
   margin: 5px;
 `;
 
+const StyledButtons = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 10px;
+`;
+
 interface FooterProps {
   onSave: () => void;
   onReset: () => void;
@@ -16,12 +24,19 @@ interface FooterProps {
 export const Footer = ({ onSave, onReset }: FooterProps): ReactElement => {
   return (
     <StyledFooter>
-      <button type='button' onClick={onSave}>
-        Save
-      </button>
-      <button type='button' onClick={onReset}>
-        Reset
-      </button>
+      <StyledButtons>
+        <Button variant="contained" onClick={onSave} color="primary">
+          Save
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={onReset}
+          color="error"
+          style={{ marginLeft: '8px' }}
+        >
+          Reset
+        </Button>
+      </StyledButtons>
     </StyledFooter>
   );
 };

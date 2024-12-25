@@ -1,5 +1,6 @@
 // import { Ebay } from '@react-liam/ebay';
 import { MyContainer } from '@react-liam/ebay';
+import { AppProvider } from '@react-liam/ebay';
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
@@ -14,7 +15,9 @@ export function App() {
     <>
       <GlobalStyles />
       {/* <Ebay /> */}
-      <MyContainer />
+      <AppProvider>
+        <MyContainer />
+      </AppProvider>
     </>
   );
 }
